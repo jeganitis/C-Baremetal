@@ -1,0 +1,135 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x0000000000000000 0x0000000000040000 xr
+SRAM             0x0000000020000000 0x0000000000010000 rw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x000000000000fa00                STACK_SIZE = 0xfa00
+                0x0000000000000000                . = 0x0
+
+.text           0x0000000000000000      0x134
+ *(.vectors)
+ .vectors       0x0000000000000000       0x40 startup.o
+                0x0000000000000000                _exceptions
+ *(.startup)
+ .startup       0x0000000000000040       0x60 startup.o
+                0x0000000000000040                _Reset_Handler
+ *(.text)
+ .text          0x00000000000000a0        0x6 startup.o
+                0x00000000000000a0                _Debug_Monitor_Handler
+                0x00000000000000a0                _SysTick_Handler
+                0x00000000000000a0                _Unused_Handler
+                0x00000000000000a0                _Hard_Fault_Handler
+                0x00000000000000a0                _Bus_Fault_Handler
+                0x00000000000000a0                _PendSV_Handler
+                0x00000000000000a0                _NMI_Handler
+                0x00000000000000a0                _SVCall_Handler
+                0x00000000000000a0                _Memory_Mgmt_Handler
+                0x00000000000000a0                _Usage_Fault_Handler
+ *fill*         0x00000000000000a6        0x2 
+ .text          0x00000000000000a8       0x58 main.o
+                0x00000000000000a8                main
+                0x00000000000000cc                uart0_print
+ *(.rodata)
+ .rodata        0x0000000000000100       0x32 main.o
+                0x0000000000000134                . = ALIGN (0x4)
+ *fill*         0x0000000000000132        0x2 
+                0x0000000000000134                _etext = .
+
+.glue_7         0x0000000000000134        0x0
+ .glue_7        0x0000000000000134        0x0 linker stubs
+
+.glue_7t        0x0000000000000134        0x0
+ .glue_7t       0x0000000000000134        0x0 linker stubs
+
+.vfp11_veneer   0x0000000000000134        0x0
+ .vfp11_veneer  0x0000000000000134        0x0 linker stubs
+
+.v4_bx          0x0000000000000134        0x0
+ .v4_bx         0x0000000000000134        0x0 linker stubs
+
+.iplt           0x0000000000000134        0x0
+ .iplt          0x0000000000000134        0x0 startup.o
+
+.rel.dyn        0x0000000000000134        0x0
+ .rel.iplt      0x0000000000000134        0x0 startup.o
+
+.data           0x0000000020000000        0x4 load address 0x0000000000000134
+                0x0000000020000000                . = ALIGN (0x4)
+                0x0000000020000000                _sram_sdata = .
+ *(.data)
+ .data          0x0000000020000000        0x0 startup.o
+ .data          0x0000000020000000        0x4 main.o
+                0x0000000020000000                lm3s6965_uart0
+                0x0000000020000004                . = ALIGN (0x4)
+                0x0000000020000004                _sram_edata = .
+                0x0000000000000134                _flash_sdata = LOADADDR (.data)
+
+.igot.plt       0x0000000020000004        0x0 load address 0x0000000000000138
+ .igot.plt      0x0000000020000004        0x0 startup.o
+
+.bss            0x0000000020000004        0x0 load address 0x0000000000000138
+                0x0000000020000004                . = ALIGN (0x4)
+                0x0000000020000004                _sram_sbss = .
+ *(.bss)
+ .bss           0x0000000020000004        0x0 startup.o
+ .bss           0x0000000020000004        0x0 main.o
+ *(COMMON)
+                0x0000000020000004                . = ALIGN (0x4)
+                0x0000000020000004                _sram_ebss = .
+
+.stack          0x0000000020000004     0xfa00 load address 0x0000000000000138
+                0x000000002000fa04                . = (. + STACK_SIZE)
+ *fill*         0x0000000020000004     0xfa00 
+                0x0000000020010000                _sram_stacktop = (ORIGIN (SRAM) + LENGTH (SRAM))
+LOAD startup.o
+LOAD main.o
+OUTPUT(output.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x0000000000000000      0x232
+ .debug_info    0x0000000000000000      0x140 startup.o
+ .debug_info    0x0000000000000140       0xf2 main.o
+
+.debug_abbrev   0x0000000000000000      0x17b
+ .debug_abbrev  0x0000000000000000       0xcf startup.o
+ .debug_abbrev  0x00000000000000cf       0xac main.o
+
+.debug_aranges  0x0000000000000000       0x48
+ .debug_aranges
+                0x0000000000000000       0x28 startup.o
+ .debug_aranges
+                0x0000000000000028       0x20 main.o
+
+.debug_ranges   0x0000000000000000       0x18
+ .debug_ranges  0x0000000000000000       0x18 startup.o
+
+.debug_line     0x0000000000000000      0x11b
+ .debug_line    0x0000000000000000       0xb9 startup.o
+ .debug_line    0x00000000000000b9       0x62 main.o
+
+.debug_str      0x0000000000000000      0x1cf
+ .debug_str     0x0000000000000000      0x193 startup.o
+                                        0x1c7 (size before relaxing)
+ .debug_str     0x0000000000000193       0x3c main.o
+                                        0x175 (size before relaxing)
+
+.comment        0x0000000000000000       0x33
+ .comment       0x0000000000000000       0x33 startup.o
+                                         0x34 (size before relaxing)
+ .comment       0x0000000000000033       0x34 main.o
+
+.ARM.attributes
+                0x0000000000000000       0x2d
+ .ARM.attributes
+                0x0000000000000000       0x2d startup.o
+ .ARM.attributes
+                0x000000000000002d       0x2d main.o
+
+.debug_frame    0x0000000000000000       0xa0
+ .debug_frame   0x0000000000000000       0x48 startup.o
+ .debug_frame   0x0000000000000048       0x58 main.o
